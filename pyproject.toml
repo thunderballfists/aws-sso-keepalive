@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aws-sso-keepalive"
+version = "0.1.0"
+description = "Keep AWS SSO sessions alive by automatically refreshing tokens before they expire"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = ["boto3"]
+
+[project.scripts]
+aws-sso-keepalive = "aws_sso_keepalive.cli:main"
+
+[project.urls]
+Repository = "https://github.com/yourusername/aws-sso-keepalive"
