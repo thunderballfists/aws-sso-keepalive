@@ -38,10 +38,12 @@ def notify_and_login(start_url: str, sso_session: str | None):
 
 
 def _macos_notify(title: str, message: str, start_url: str, login_cmd: str):
-    on_click_script = (
-        f'open "{start_url}" && '
-        f'osascript -e \'tell app "Terminal" to do script "{login_cmd}"\''
-    )
+    # Just open the browser — aws sso login runs as a detached subprocess
+    # (no terminal app dependency, works with any terminal: Ghostty, iTerm, etc.)
+    script_path = Path.home() / ".aws" / "sso-login.sh"
+    script_path.write_text(f"#!/bin/sh\nopen '{start_url}'\n{login_cmd}\n")
+    script_path.chmod(0o755)
+    on_click_script = str(script_path)
 
     try:
         subprocess.run(
