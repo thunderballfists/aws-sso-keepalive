@@ -15,4 +15,4 @@ dependencies = ["boto3"]
 aws-sso-keepalive = "aws_sso_keepalive.cli:main"
 
 [project.urls]
-Repository = "https://github.com/yourusername/aws-sso-keepalive"
+Repository = "https://github.com/thunderballfists/aws-sso-keepalive"
