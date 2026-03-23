@@ -66,7 +66,7 @@ def refresh_token(token: dict) -> bool:
             grantType="refresh_token",
             refreshToken=token["refreshToken"],
         )
-    except (client.exceptions.UnauthorizedException, client.exceptions.InvalidGrantException):
+    except (client.exceptions.UnauthorizedClientException, client.exceptions.ExpiredTokenException, client.exceptions.InvalidGrantException):
         prompt_sso_login(token.get("startUrl", "unknown"))
         return False
     except Exception as e:
@@ -104,6 +104,17 @@ def refresh_all() -> int:
     refreshed = 0
     for token in tokens:
         start_url = token.get("startUrl", "unknown")
+
+        # Skip tokens that expired long ago (>1 hour) — their refresh token is likely dead
+        try:
+            expires_at = parse_expiry(token["expiresAt"])
+            expired_seconds = (datetime.now(timezone.utc) - expires_at).total_seconds()
+            if expired_seconds > 3600:
+                log.debug("Skipping stale token for %s (expired %.0f hours ago).", start_url, expired_seconds / 3600)
+                continue
+        except (KeyError, ValueError):
+            pass
+
         if token_needs_refresh(token):
             log.info("Token for %s is expiring soon, refreshing...", start_url)
             if refresh_token(token):
