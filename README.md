@@ -2,23 +2,21 @@
 
 Keep AWS SSO sessions alive by automatically refreshing tokens before they expire. Fully headless — no browser interaction needed (until the refresh token itself expires).
 
+Works on **macOS**, **Linux**, and **Windows**.
+
 ## Install
 
 ```bash
-pip install aws-sso-keepalive
-# or
-pipx install aws-sso-keepalive
+pip install git+https://github.com/thunderballfists/aws-sso-keepalive.git
 ```
 
-### Optional: macOS notifications
-
-For native macOS Notification Center alerts when the refresh token expires:
+Then set up auto-start:
 
 ```bash
-brew install terminal-notifier
+aws-sso-keepalive install
 ```
 
-On Linux, `zenity` or `kdialog` is used for dialogs (usually pre-installed on GNOME/KDE).
+The installer auto-detects your platform, sets up the background service, and on macOS offers to install `terminal-notifier` for native Notification Center alerts (~4 second direct download from GitHub, no Homebrew needed).
 
 ## Usage
 
@@ -26,7 +24,7 @@ On Linux, `zenity` or `kdialog` is used for dialogs (usually pre-installed on GN
 # Refresh tokens once
 aws-sso-keepalive run --once
 
-# Run in foreground (refreshes every 45 min)
+# Run in foreground (checks every 45 min)
 aws-sso-keepalive run
 
 # Run as background daemon (Unix)
@@ -36,39 +34,40 @@ aws-sso-keepalive run --daemon
 aws-sso-keepalive run --interval 1800
 ```
 
-## Auto-start on login
+## Managing the service
 
 ```bash
-# Install as a system service (auto-detected per platform)
-aws-sso-keepalive install
-
-# Check status
-aws-sso-keepalive status
-
-# View logs
-aws-sso-keepalive logs
-aws-sso-keepalive logs -f    # follow
-
-# Remove the service
-aws-sso-keepalive uninstall
+aws-sso-keepalive status      # check if running
+aws-sso-keepalive logs        # view log output
+aws-sso-keepalive logs -f     # follow logs
+aws-sso-keepalive uninstall   # remove the service
 ```
 
-| Platform | Service type |
-|----------|-------------|
-| macOS    | launchd agent (`~/Library/LaunchAgents/`) |
-| Linux    | systemd user timer (`~/.config/systemd/user/`) |
-| Windows  | Task Scheduler |
+## Platform support
+
+| Platform | Service type | Notification on token expiry |
+|----------|-------------|------------------------------|
+| macOS    | launchd agent (`~/Library/LaunchAgents/`) | `terminal-notifier` (Notification Center) or `osascript` dialog |
+| Linux    | systemd user timer (`~/.config/systemd/user/`) | `zenity` or `kdialog` dialog |
+| Windows  | Task Scheduler | PowerShell MessageBox |
 
 ## How it works
 
-1. Scans `~/.aws/sso/cache/` for tokens with a `refreshToken`
+1. Checks `~/.aws/sso/cache/` every 45 minutes for tokens with a `refreshToken`
 2. If a token expires within 15 minutes, calls the SSO OIDC `CreateToken` API with the `refresh_token` grant
 3. Writes the new access token back to the cache file
+4. Skips stale tokens that expired more than 1 hour ago
 
-When the refresh token itself expires (typically 30–90 days), you'll get a native OS notification. On macOS, clicking the notification opens your browser and runs `aws sso login` automatically.
+Every tool that uses AWS credentials (CLI, SDK, Terraform, CDK, etc.) benefits — no more mid-work auth interruptions.
+
+When the long-lived refresh token itself expires (~90 days), you get a native OS notification. On macOS, clicking the notification opens your browser to re-authenticate.
 
 ## Requirements
 
 - Python 3.10+
-- AWS CLI v2 configured with `sso-session` (provides the refresh token)
-- `boto3` (installed as dependency)
+- AWS CLI v2 configured with [`sso-session`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html) (provides the refresh token)
+- `boto3` (installed as a dependency)
+
+## License
+
+MIT
