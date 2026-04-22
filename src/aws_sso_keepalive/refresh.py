@@ -66,7 +66,12 @@ def refresh_token(token: dict) -> bool:
             grantType="refresh_token",
             refreshToken=token["refreshToken"],
         )
-    except (client.exceptions.UnauthorizedClientException, client.exceptions.ExpiredTokenException, client.exceptions.InvalidGrantException):
+    except (
+        client.exceptions.InvalidClientException,
+        client.exceptions.InvalidGrantException,
+        client.exceptions.UnauthorizedClientException,
+        client.exceptions.ExpiredTokenException,
+    ):
         prompt_sso_login(token.get("startUrl", "unknown"))
         return False
     except Exception as e:

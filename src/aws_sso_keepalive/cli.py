@@ -9,14 +9,14 @@ import sys
 import time
 from pathlib import Path
 
+from . import DEFAULT_INTERVAL
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 log = logging.getLogger("aws-sso-keepalive")
-
-DEFAULT_INTERVAL = 2700  # 45 minutes
 
 
 def cmd_run(args):

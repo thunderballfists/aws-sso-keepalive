@@ -8,8 +8,9 @@ import sys
 import textwrap
 from pathlib import Path
 
+from . import DEFAULT_INTERVAL as INTERVAL
+
 LABEL = "com.aws.sso-keepalive"
-INTERVAL = 2700  # 45 minutes
 
 
 def get_exe_path() -> str:

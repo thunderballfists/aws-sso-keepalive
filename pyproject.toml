@@ -4,15 +4,39 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aws-sso-keepalive"
-version = "0.1.0"
+version = "0.1.1"
 description = "Keep AWS SSO sessions alive by automatically refreshing tokens before they expire"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 dependencies = ["boto3"]
+authors = [{name = "Allan Beihl"}]
+keywords = ["aws", "sso", "oidc", "keepalive", "token", "refresh", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Systems Administration :: Authentication/Directory",
+    "Topic :: Utilities",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
 
 [project.scripts]
 aws-sso-keepalive = "aws_sso_keepalive.cli:main"
 
 [project.urls]
 Repository = "https://github.com/thunderballfists/aws-sso-keepalive"
+Issues = "https://github.com/thunderballfists/aws-sso-keepalive/issues"
+Changelog = "https://github.com/thunderballfists/aws-sso-keepalive/blob/main/CHANGELOG.md"
